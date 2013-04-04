@@ -12,20 +12,13 @@ import scala.util.control.NonFatal
 import java.util.UUID
 import akka.actor.{ Actor, ActorLogging, ActorRef, Address, Cancellable, Props, PoisonPill, ReceiveTimeout, RootActorPath, Scheduler }
 import akka.actor.OneForOneStrategy
-import akka.actor.Status.Failure
 import akka.actor.SupervisorStrategy.Stop
-import akka.actor.Terminated
-import akka.event.EventStream
-import akka.pattern.ask
-import akka.util.Timeout
 import akka.cluster.MemberStatus._
 import akka.cluster.ClusterEvent._
 import akka.actor.ActorSelection
 
 /**
  * Base trait for all cluster messages. All ClusterMessage's are serializable.
- *
- * FIXME Protobuf all ClusterMessages
  */
 trait ClusterMessage extends Serializable
 
@@ -61,7 +54,7 @@ private[cluster] object InternalClusterAction {
    * Command to initiate join another node (represented by 'address').
    * Join will be sent to the other node.
    */
-  case class JoinTo(address: Address) extends ClusterMessage
+  case class JoinTo(address: Address)
 
   /**
    * Command to initiate the process to join the specified
@@ -77,7 +70,7 @@ private[cluster] object InternalClusterAction {
    * If a node is uninitialized it will reply to `InitJoin` with
    * `InitJoinNack`.
    */
-  case object JoinSeedNode extends ClusterMessage
+  case object JoinSeedNode
 
   /**
    * @see JoinSeedNode

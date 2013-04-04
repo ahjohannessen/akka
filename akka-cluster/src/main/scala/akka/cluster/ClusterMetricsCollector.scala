@@ -267,7 +267,7 @@ object EWMA {
  *             This value is always used as the previous EWMA to calculate the new EWMA.
  *
  */
-private[cluster] case class EWMA(value: Double, alpha: Double) extends ClusterMessage {
+private[cluster] case class EWMA(value: Double, alpha: Double) {
 
   require(0.0 <= alpha && alpha <= 1.0, "alpha must be between 0.0 and 1.0")
 
@@ -296,8 +296,8 @@ private[cluster] case class EWMA(value: Double, alpha: Double) extends ClusterMe
  * @param average the data stream of the metric value, for trending over time. Metrics that are already
  *   averages (e.g. system load average) or finite (e.g. as number of processors), are not trended.
  */
-case class Metric private (name: String, value: Number, private val average: Option[EWMA])
-  extends ClusterMessage with MetricNumericConverter {
+case class Metric private[cluster] (name: String, value: Number, private[cluster] val average: Option[EWMA])
+  extends MetricNumericConverter {
 
   require(defined(value), s"Invalid Metric [$name] value [$value]")
 
@@ -378,7 +378,7 @@ object Metric extends MetricNumericConverter {
  * @param timestamp the time of sampling, in milliseconds since midnight, January 1, 1970 UTC
  * @param metrics the set of sampled [[akka.actor.Metric]]
  */
-case class NodeMetrics(address: Address, timestamp: Long, metrics: Set[Metric] = Set.empty[Metric]) extends ClusterMessage {
+case class NodeMetrics(address: Address, timestamp: Long, metrics: Set[Metric] = Set.empty[Metric]) {
 
   /**
    * Returns the most recent data.

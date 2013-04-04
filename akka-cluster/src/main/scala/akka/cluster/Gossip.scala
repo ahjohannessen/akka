@@ -59,8 +59,7 @@ private[cluster] case class Gossip(
   members: immutable.SortedSet[Member], // sorted set of members with their status, sorted by address
   overview: GossipOverview = GossipOverview(),
   version: VectorClock = VectorClock()) // vector clock version
-  extends ClusterMessage // is a serializable cluster message
-  with Versioned[Gossip] {
+  extends Versioned[Gossip] {
 
   // FIXME can be disabled as optimization
   assertInvariants()

@@ -72,14 +72,19 @@ object VectorClock {
   /**
    * Hash representation of a versioned node name.
    */
-  sealed trait Node extends Serializable
+  sealed trait Node extends Serializable {
+    def hash: String
+  }
 
   object Node {
     private case class NodeImpl(name: String) extends Node {
       override def toString(): String = "Node(" + name + ")"
+      override def hash: String = name
     }
 
     def apply(name: String): Node = NodeImpl(hash(name))
+
+    def fromHash(hash: String): Node = NodeImpl(hash)
 
     private def hash(name: String): String = {
       val digester = MessageDigest.getInstance("MD5")
@@ -91,7 +96,7 @@ object VectorClock {
   /**
    * Timestamp representation a unique 'Ordered' timestamp.
    */
-  case class Timestamp private (time: Long) extends Ordered[Timestamp] {
+  case class Timestamp(time: Long) extends Ordered[Timestamp] {
     def max(other: Timestamp) = {
       if (this < other) other
       else this
