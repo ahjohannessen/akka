@@ -133,16 +133,16 @@ private[akka] class RemoteActorRefProvider(
   override def tempPath(): ActorPath = local.tempPath()
   override def tempContainer: VirtualPathContainer = local.tempContainer
 
-  @volatile
-  private var _internals: Internals = _
+  @volatile private var _internals: Internals = _
 
   def transport: RemoteTransport = _internals.transport
   def serialization: Serialization = _internals.serialization
   def remoteDaemon: InternalActorRef = _internals.remoteDaemon
 
   // This actor ensures the ordering of shutdown between remoteDaemon and the transport
-  @volatile
-  private var remotingTerminator: ActorRef = _
+  @volatile private var remotingTerminator: ActorRef = _
+
+  @volatile private var remoteWatcher: ActorRef = _
 
   def init(system: ActorSystemImpl): Unit = {
     local.init(system)
@@ -166,6 +166,7 @@ private[akka] class RemoteActorRefProvider(
 
     _internals = internals
     remotingTerminator ! internals
+    remoteWatcher = system.systemActorOf(Props(new RemoteWatcher), "remote-watcher")
 
     _log = Logging(eventStream, "RemoteActorRefProvider")
 
@@ -367,6 +368,15 @@ private[akka] class RemoteActorRefProvider(
   private def hasAddress(address: Address): Boolean =
     address == local.rootPath.address || address == rootPath.address || transport.addresses(address)
 
+  /**
+   * INTERNAL API
+   */
+  private[akka] def afterSendSystemMessage(message: SystemMessage): Unit = message match {
+    case Watch(watchee, watcher)   ⇒ remoteWatcher ! RemoteWatcher.WatchRemote(watchee)
+    case Unwatch(watchee, watcher) ⇒ remoteWatcher ! RemoteWatcher.UnwatchRemote(watchee)
+    case _                         ⇒
+  }
+
 }
 
 private[akka] trait RemoteRef extends ActorRefScope {
@@ -406,7 +416,11 @@ private[akka] class RemoteActorRef private[akka] (
       remote.system.eventStream.publish(Error(e, path.toString, getClass, "swallowing exception during message send"))
   }
 
-  def sendSystemMessage(message: SystemMessage): Unit = try remote.send(message, None, this) catch handleException
+  def sendSystemMessage(message: SystemMessage): Unit =
+    try {
+      remote.send(message, None, this)
+      provider.afterSendSystemMessage(message)
+    } catch handleException
 
   override def !(message: Any)(implicit sender: ActorRef = Actor.noSender): Unit = {
     if (message == null) throw new InvalidMessageException("Message is null")
