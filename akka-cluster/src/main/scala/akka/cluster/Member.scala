@@ -17,6 +17,7 @@ import MemberStatus._
  * Note: `hashCode` and `equals` are solely based on the underlying `Address`, not its `MemberStatus`
  * and roles.
  */
+@SerialVersionUID(1L)
 class Member(val address: Address, val status: MemberStatus, val roles: Set[String]) extends Serializable {
   override def hashCode = address.##
   override def equals(other: Any) = other match {
@@ -126,11 +127,17 @@ object Member {
 abstract class MemberStatus
 
 object MemberStatus {
+  @SerialVersionUID(1L)
   case object Joining extends MemberStatus
+  @SerialVersionUID(1L)
   case object Up extends MemberStatus
+  @SerialVersionUID(1L)
   case object Leaving extends MemberStatus
+  @SerialVersionUID(1L)
   case object Exiting extends MemberStatus
+  @SerialVersionUID(1L)
   case object Down extends MemberStatus
+  @SerialVersionUID(1L)
   case object Removed extends MemberStatus
 
   /**

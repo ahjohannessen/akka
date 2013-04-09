@@ -181,6 +181,7 @@ private[cluster] object MetricsGossip {
  *
  * @param nodes metrics per node
  */
+@SerialVersionUID(1L)
 private[cluster] case class MetricsGossip(nodes: Set[NodeMetrics]) {
 
   /**
@@ -220,6 +221,7 @@ private[cluster] case class MetricsGossip(nodes: Set[NodeMetrics]) {
  * INTERNAL API
  * Envelope adding a sender address to the gossip.
  */
+@SerialVersionUID(1L)
 private[cluster] case class MetricsGossipEnvelope(from: Address, gossip: MetricsGossip, reply: Boolean)
   extends ClusterMessage
 
@@ -267,6 +269,7 @@ object EWMA {
  *             This value is always used as the previous EWMA to calculate the new EWMA.
  *
  */
+@SerialVersionUID(1L)
 private[cluster] case class EWMA(value: Double, alpha: Double) {
 
   require(0.0 <= alpha && alpha <= 1.0, "alpha must be between 0.0 and 1.0")
@@ -296,6 +299,7 @@ private[cluster] case class EWMA(value: Double, alpha: Double) {
  * @param average the data stream of the metric value, for trending over time. Metrics that are already
  *   averages (e.g. system load average) or finite (e.g. as number of processors), are not trended.
  */
+@SerialVersionUID(1L)
 case class Metric private[cluster] (name: String, value: Number, private[cluster] val average: Option[EWMA])
   extends MetricNumericConverter {
 
@@ -378,6 +382,7 @@ object Metric extends MetricNumericConverter {
  * @param timestamp the time of sampling, in milliseconds since midnight, January 1, 1970 UTC
  * @param metrics the set of sampled [[akka.actor.Metric]]
  */
+@SerialVersionUID(1L)
 case class NodeMetrics(address: Address, timestamp: Long, metrics: Set[Metric] = Set.empty[Metric]) {
 
   /**
@@ -473,6 +478,7 @@ object StandardMetrics {
    * @param max the maximum amount of memory (in bytes) that can be used for JVM memory management.
    *   Can be undefined on some OS.
    */
+  @SerialVersionUID(1L)
   case class HeapMemory(address: Address, timestamp: Long, used: Long, committed: Long, max: Option[Long]) {
     require(committed > 0L, "committed heap expected to be > 0 bytes")
     require(max.isEmpty || max.get > 0L, "max heap expected to be > 0 bytes")
@@ -516,6 +522,7 @@ object StandardMetrics {
    *   much more it could theoretically.
    * @param processors the number of available processors
    */
+  @SerialVersionUID(1L)
   case class Cpu(
     address: Address,
     timestamp: Long,

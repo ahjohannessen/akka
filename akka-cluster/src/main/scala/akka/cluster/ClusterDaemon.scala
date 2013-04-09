@@ -31,16 +31,19 @@ object ClusterUserAction {
    * Command to join the cluster. Sent when a node (represented by 'address')
    * wants to join another node (the receiver).
    */
+  @SerialVersionUID(1L)
   case class Join(address: Address, roles: Set[String]) extends ClusterMessage
 
   /**
    * Command to leave the cluster.
    */
+  @SerialVersionUID(1L)
   case class Leave(address: Address) extends ClusterMessage
 
   /**
    * Command to mark node as temporary down.
    */
+  @SerialVersionUID(1L)
   case class Down(address: Address) extends ClusterMessage
 
 }
@@ -75,16 +78,19 @@ private[cluster] object InternalClusterAction {
   /**
    * @see JoinSeedNode
    */
+  @SerialVersionUID(1L)
   case object InitJoin extends ClusterMessage
 
   /**
    * @see JoinSeedNode
    */
+  @SerialVersionUID(1L)
   case class InitJoinAck(address: Address) extends ClusterMessage
 
   /**
    * @see JoinSeedNode
    */
+  @SerialVersionUID(1L)
   case class InitJoinNack(address: Address) extends ClusterMessage
 
   /**
@@ -142,11 +148,13 @@ private[cluster] object ClusterLeaderAction {
    * Command to mark a node to be removed from the cluster immediately.
    * Can only be sent by the leader.
    */
+  @SerialVersionUID(1L)
   case class Exit(address: Address) extends ClusterMessage
 
   /**
    * Command to remove a node from the cluster immediately.
    */
+  @SerialVersionUID(1L)
   case class Remove(address: Address) extends ClusterMessage
 }
 
@@ -1003,6 +1011,7 @@ private[cluster] class OnMemberUpListener(callback: Runnable) extends Actor with
 /**
  * INTERNAL API
  */
+@SerialVersionUID(1L)
 private[cluster] case class ClusterStats(
   receivedGossipCount: Long = 0L,
   mergeCount: Long = 0L,
